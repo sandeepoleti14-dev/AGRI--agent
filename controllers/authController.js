@@ -10,140 +10,192 @@ const db = require('../config/db');
 const SALT_ROUNDS = 10;
 
 /**
- * Register a new student account
- * Uses bcrypt password hashing and parameterized SQL queries.
+ * Register a new student
+ * Uses email + password.
  */
 async function register(req, res) {
   try {
-    const { username, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!username || typeof username !== 'string' || username.trim() === '') {
-      return res.status(400).json({ error: 'Username is required and cannot be empty.' });
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      return res.status(400).json({
+        error: 'Name is required.'
+      });
+    }
+
+    if (!email || typeof email !== 'string' || email.trim() === '') {
+      return res.status(400).json({
+        error: 'Email is required.'
+      });
     }
 
     if (!password || typeof password !== 'string' || password.length < 4) {
-      return res.status(400).json({ error: 'Password must be at least 4 characters long.' });
+      return res.status(400).json({
+        error: 'Password must be at least 4 characters long.'
+      });
     }
 
-    const cleanUsername = username.trim();
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
-    // Check if username already exists using a parameterized query
-    const [existing] = await db.query('SELECT id FROM users WHERE username = ?', [cleanUsername]);
-    if (existing && existing.length > 0) {
-      return res.status(409).json({ error: 'Username already taken. Please choose another.' });
+    // Check whether email already exists
+    const existing = await db.query(
+      'SELECT id FROM users WHERE email = $1',
+      [cleanEmail]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.status(409).json({
+        error: 'Email already registered. Please use another email.'
+      });
     }
 
-    // Hash password with bcrypt
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-    // Insert user using parameterized query to prevent SQL injection
-    const [result] = await db.query('INSERT INTO users (username, password) VALUES (?, ?)', [
-      cleanUsername,
-      hashedPassword
-    ]);
+    // Insert user
+    const result = await db.query(
+      `INSERT INTO users (name, email, password_hash)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, email, created_at`,
+      [cleanName, cleanEmail, hashedPassword]
+    );
 
-    // Establish authenticated session
-    req.session.userId = result.insertId;
-    req.session.username = cleanUsername;
+    const user = result.rows[0];
+
+    // Establish session
+    req.session.userId = user.id;
+    req.session.email = user.email;
+    req.session.name = user.name;
 
     return res.status(201).json({
       message: 'User registered successfully.',
-      user: {
-        id: result.insertId,
-        username: cleanUsername
-      }
+      user
     });
+
   } catch (error) {
     console.error('Registration error:', error);
-    return res.status(500).json({ error: 'Internal server error during registration.' });
+    return res.status(500).json({
+      error: 'Internal server error during registration.'
+    });
   }
 }
 
 /**
  * Secure login
- * Prevents SQL injection using parameterized query (?) and verifies hash with bcrypt.
  */
 async function login(req, res) {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Both username and password are required.' });
+    if (!email || !password) {
+      return res.status(400).json({
+        error: 'Email and password are required.'
+      });
     }
 
-    // SECURE: Parameterized query ensures user input is strictly treated as data
-    const [rows] = await db.query('SELECT id, username, password FROM users WHERE username = ?', [
-      username.trim()
-    ]);
+    const cleanEmail = email.trim().toLowerCase();
 
-    if (!rows || rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid username or password.' });
+    // Parameterized PostgreSQL query
+    const result = await db.query(
+      `SELECT id, name, email, password_hash
+       FROM users
+       WHERE email = $1`,
+      [cleanEmail]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        error: 'Invalid email or password.'
+      });
     }
 
-    const user = rows[0];
+    const user = result.rows[0];
 
-    // Verify password against stored bcrypt hash
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Compare password with stored bcrypt hash
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
+
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid username or password.' });
+      return res.status(401).json({
+        error: 'Invalid email or password.'
+      });
     }
 
-    // Set authenticated session
+    // Establish session
     req.session.userId = user.id;
-    req.session.username = user.username;
+    req.session.email = user.email;
+    req.session.name = user.name;
 
     return res.json({
       message: 'Login successful.',
       user: {
         id: user.id,
-        username: user.username
+        name: user.name,
+        email: user.email
       }
     });
+
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Internal server error during login.' });
+    return res.status(500).json({
+      error: 'Internal server error during login.'
+    });
   }
 }
 
 /**
- * Insecure Login Demonstration
- * Shows vulnerability to SQL injection when user input is concatenated directly.
- * Example payload: { "username": "' OR '1'='1' -- ", "password": "any" }
+ * SQL Injection demonstration
+ *
+ * This endpoint intentionally demonstrates what NOT to do.
  */
 async function loginVulnerable(req, res) {
   try {
-    const { username } = req.body;
+    const { email } = req.body;
 
-    if (!username) {
-      return res.status(400).json({ error: 'Username is required.' });
+    if (!email) {
+      return res.status(400).json({
+        error: 'Email is required.'
+      });
     }
 
-    // INSECURE: Direct concatenation enables SQL injection
-    const rawSql = `SELECT id, username, password FROM users WHERE username = '${username}'`;
-    console.warn(`[SQL INJECTION DEMO] Executing raw query: ${rawSql}`);
+    // INTENTIONALLY INSECURE - demonstration only
+    const rawSql =
+      `SELECT id, name, email, password_hash FROM users WHERE email = '${email}'`;
 
-    const [rows] = await db.query(rawSql);
+    console.warn(
+      `[SQL INJECTION DEMO] Executing raw query: ${rawSql}`
+    );
 
-    if (rows && rows.length > 0) {
-      const injectedUser = rows[0];
+    const result = await db.query(rawSql);
+
+    if (result.rows.length > 0) {
+      const injectedUser = result.rows[0];
+
       req.session.userId = injectedUser.id;
-      req.session.username = injectedUser.username;
+      req.session.email = injectedUser.email;
+      req.session.name = injectedUser.name;
 
       return res.json({
-        warning: 'DEMO VULNERABILITY EXPLOITED: Raw SQL was executed without parameterization!',
+        warning:
+          'DEMO VULNERABILITY: Raw SQL was executed without parameterization.',
         executedSql: rawSql,
-        message: 'Bypassed authentication via SQL injection!',
+        message: 'Authentication bypass demonstration.',
         user: {
           id: injectedUser.id,
-          username: injectedUser.username
+          name: injectedUser.name,
+          email: injectedUser.email
         }
       });
     }
 
     return res.status(401).json({
-      error: 'Invalid credentials or query returned no rows.',
+      error: 'No matching user found.',
       executedSql: rawSql
     });
+
   } catch (error) {
     return res.status(400).json({
       error: 'SQL Execution Error: ' + error.message
@@ -153,25 +205,33 @@ async function loginVulnerable(req, res) {
 
 /**
  * Logout
- * Destroys session on the server and clears the session cookie.
  */
 function logout(req, res) {
   if (!req.session || !req.session.userId) {
-    return res.status(200).json({ message: 'Already logged out or no active session.' });
+    return res.status(200).json({
+      message: 'Already logged out or no active session.'
+    });
   }
 
   req.session.destroy((err) => {
     if (err) {
       console.error('Session destruction error:', err);
-      return res.status(500).json({ error: 'Could not log out. Please try again.' });
+
+      return res.status(500).json({
+        error: 'Could not log out. Please try again.'
+      });
     }
+
     res.clearCookie('student_notes_sid');
-    return res.json({ message: 'Logout successful.' });
+
+    return res.json({
+      message: 'Logout successful.'
+    });
   });
 }
 
 /**
- * Get current authenticated user session
+ * Get current authenticated user
  */
 function getCurrentUser(req, res) {
   if (req.session && req.session.userId) {
@@ -179,10 +239,12 @@ function getCurrentUser(req, res) {
       authenticated: true,
       user: {
         id: req.session.userId,
-        username: req.session.username
+        name: req.session.name,
+        email: req.session.email
       }
     });
   }
+
   return res.status(401).json({
     authenticated: false,
     error: 'Not authenticated.'
