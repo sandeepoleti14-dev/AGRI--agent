@@ -148,6 +148,89 @@ async function getNoteById(req, res) {
 }
 
 /**
+ * Update an existing note.
+ * Ensures student can only update their own note.
+ */
+async function updateNote(req, res) {
+  try {
+    const userId = req.session.userId;
+    const noteId = Number(req.params.id);
+    const { title, content } = req.body;
+
+    if (isNaN(noteId)) {
+      return res.status(400).json({
+        error: 'Invalid note ID provided.'
+      });
+    }
+
+    if (!title || typeof title !== 'string' || title.trim() === '') {
+      return res.status(400).json({
+        error: 'Validation error: Title is required and cannot be empty.'
+      });
+    }
+
+    if (
+      content === undefined ||
+      content === null ||
+      typeof content !== 'string'
+    ) {
+      return res.status(400).json({
+        error: 'Validation error: Content is required and must be a string.'
+      });
+    }
+
+    const titleBytes = Buffer.byteLength(title, 'utf8');
+    const contentBytes = Buffer.byteLength(content, 'utf8');
+
+    if (titleBytes > MAX_TITLE_BYTES) {
+      return res.status(400).json({
+        error: `Validation error: Title exceeds the maximum limit of ${MAX_TITLE_BYTES} bytes (received: ${titleBytes} bytes).`
+      });
+    }
+
+    if (contentBytes > MAX_CONTENT_BYTES) {
+      return res.status(400).json({
+        error: `Validation error: Note content exceeds the maximum limit of ${MAX_CONTENT_BYTES} bytes (received: ${contentBytes} bytes).`
+      });
+    }
+
+    const trimmedTitle = title.trim();
+
+    const existing = await db.query(
+      `SELECT id FROM notes WHERE id = $1 AND user_id = $2`,
+      [noteId, userId]
+    );
+
+    if (existing.rows.length === 0) {
+      return res.status(404).json({
+        error: 'Note not found.'
+      });
+    }
+
+    const result = await db.query(
+      `UPDATE notes
+       SET title = $1,
+           content = $2,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $3
+       AND user_id = $4
+       RETURNING id, title, content, created_at, updated_at`,
+      [trimmedTitle, content, noteId, userId]
+    );
+
+    return res.json({
+      message: 'Note updated successfully.',
+      note: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error updating note:', error);
+    return res.status(500).json({
+      error: 'Internal server error while updating note.'
+    });
+  }
+}
+
+/**
  * Delete note by ID.
  * Ensures student can only delete their own note.
  */
@@ -199,5 +282,6 @@ module.exports = {
   getNotes,
   createNote,
   getNoteById,
+  updateNote,
   deleteNote
 };
