@@ -22,14 +22,16 @@ RETURNING *;
 
 
 -- 4. Get all notes belonging to a user
-SELECT *
+SELECT id, title, content, created_at, updated_at,
+       attachment_path, attachment_name, attachment_mime_type, attachment_size
 FROM notes
 WHERE user_id = $1
 ORDER BY created_at DESC;
 
 
 -- 5. Get one specific note belonging to a user
-SELECT *
+SELECT id, title, content, created_at, updated_at,
+       attachment_path, attachment_name, attachment_mime_type, attachment_size
 FROM notes
 WHERE id = $1
 AND user_id = $2;
@@ -40,13 +42,24 @@ UPDATE notes
 SET
     title = $1,
     content = $2,
-    updated_at = CURRENT_TIMESTAMP
-WHERE id = $3
-AND user_id = $4
+    updated_at = CURRENT_TIMESTAMP,
+    attachment_path = $3,
+    attachment_name = $4,
+    attachment_mime_type = $5,
+    attachment_size = $6
+WHERE id = $7
+AND user_id = $8
 RETURNING *;
 
 
--- 7. Delete a user's note
+-- 7. Get attachment metadata before issuing an authenticated signed URL
+SELECT attachment_path, attachment_name
+FROM notes
+WHERE id = $1
+AND user_id = $2;
+
+
+-- 8. Delete a user's note after removing its private Storage object
 DELETE FROM notes
 WHERE id = $1
 AND user_id = $2;

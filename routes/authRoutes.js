@@ -9,9 +9,6 @@ router.post('/register', authController.register);
 // Secure Login (Parameterized queries + Bcrypt)
 router.post('/login', authController.login);
 
-// Insecure Login Demonstration (SQL Injection demonstration)
-router.post('/login-vulnerable', authController.loginVulnerable);
-
 // Logout and session invalidation
 router.post('/logout', authController.logout);
 

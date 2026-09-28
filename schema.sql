@@ -21,12 +21,25 @@ CREATE TABLE notes (
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    attachment_path TEXT,
+    attachment_name VARCHAR(255),
+    attachment_mime_type VARCHAR(127),
+    attachment_size BIGINT,
 
     -- Connect each note to its owner
     CONSTRAINT fk_notes_user
         FOREIGN KEY (user_id)
         REFERENCES users(id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT notes_attachment_metadata_check
+        CHECK (
+            (attachment_path IS NULL AND attachment_name IS NULL
+                AND attachment_mime_type IS NULL AND attachment_size IS NULL)
+            OR
+            (attachment_path IS NOT NULL AND attachment_name IS NOT NULL
+                AND attachment_mime_type IS NOT NULL
+                AND attachment_size IS NOT NULL AND attachment_size >= 0)
+        )
 );
 
 -- Index to make finding a user's notes faster

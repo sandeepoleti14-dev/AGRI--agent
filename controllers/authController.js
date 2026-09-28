@@ -9,6 +9,29 @@ const db = require('../config/db');
 
 const SALT_ROUNDS = 10;
 
+function establishSession(req, user) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((error) => {
+      if (error) {
+        return reject(error);
+      }
+
+      req.session.userId = user.id;
+      req.session.email = user.email;
+      req.session.name = user.name;
+      req.session.phone = user.phone;
+
+      req.session.save((saveError) => {
+        if (saveError) {
+          return reject(saveError);
+        }
+
+        resolve();
+      });
+    });
+  });
+}
+
 /**
  * Register a new user - DIRECT registration without OTP verification
  * Saves: name, email, phone, password
@@ -36,9 +59,9 @@ async function register(req, res) {
       });
     }
 
-    if (!password || typeof password !== 'string' || password.length < 4) {
+    if (!password || typeof password !== 'string' || password.length < 8) {
       return res.status(400).json({
-        error: 'Password must be at least 4 characters long.'
+        error: 'Password must be at least 8 characters long.'
       });
     }
 
@@ -84,10 +107,7 @@ async function register(req, res) {
     const user = result.rows[0];
 
     // Establish session immediately after registration
-    req.session.userId = user.id;
-    req.session.email = user.email;
-    req.session.name = user.name;
-    req.session.phone = user.phone;
+    await establishSession(req, user);
 
     return res.status(201).json({
       message: 'User registered successfully. You are now logged in.',
@@ -114,7 +134,12 @@ async function login(req, res) {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    if (
+      typeof email !== 'string' ||
+      email.trim() === '' ||
+      typeof password !== 'string' ||
+      password === ''
+    ) {
       return res.status(400).json({
         error: 'Email and password are required.'
       });
@@ -151,10 +176,7 @@ async function login(req, res) {
     }
 
     // Establish session
-    req.session.userId = user.id;
-    req.session.email = user.email;
-    req.session.name = user.name;
-    req.session.phone = user.phone;
+    await establishSession(req, user);
 
     return res.json({
       message: 'Login successful.',
@@ -252,7 +274,7 @@ function logout(req, res) {
       });
     }
 
-    res.clearCookie('student_notes_sid');
+    res.clearCookie('student_notes_sid', { path: '/' });
 
     return res.json({
       message: 'Logout successful.'
@@ -285,7 +307,6 @@ function getCurrentUser(req, res) {
 module.exports = {
   register,
   login,
-  loginVulnerable,
   logout,
   getCurrentUser
 };
