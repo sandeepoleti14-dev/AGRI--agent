@@ -94,7 +94,7 @@
         <nav id="nav-logged-in" class="space-x-4 items-center hidden">
 
             <span class="font-semibold text-gray-700 hidden sm:inline">
-                Welcome, Student
+                Welcome, <span id="welcome-name">Student</span>
             </span>
 
             <button
@@ -152,219 +152,96 @@
 
             <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
 
-                <!-- Registration Step 1 -->
-                <div id="reg-step-1">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                    Create an Account
+                </h2>
 
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">
-                        Create an Account
-                    </h2>
+                <p class="text-sm text-gray-500 mb-6">
+                    Register and start creating notes
+                </p>
 
-                    <p class="text-sm text-gray-500 mb-6">
-                        Step 1 of 2: Basic Information
-                    </p>
+                <form id="form-register" onsubmit="handleRegister(event)">
 
-                    <form
-                        id="form-register-1"
-                        onsubmit="handleRegisterStep1(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Full Name
+                        </label>
+                        <input
+                            type="text"
+                            id="reg-name"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            oninput="clearRegErrors()">
+                        <p id="error-name" class="text-danger text-xs mt-1 hidden font-semibold"></p>
+                    </div>
 
-                        <div class="mb-4">
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Email Address
+                        </label>
+                        <input
+                            type="email"
+                            id="reg-email"
+                            placeholder="student@gmail.com"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            oninput="clearRegErrors()">
+                        <p id="error-email" class="text-danger text-xs mt-1 hidden font-semibold"></p>
+                    </div>
 
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Username
-                            </label>
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            id="reg-phone"
+                            placeholder="9876543210"
+                            maxlength="10"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            oninput="clearRegErrors()">
+                        <p id="error-phone" class="text-danger text-xs mt-1 hidden font-semibold"></p>
+                    </div>
 
+                    <div class="mb-6 relative">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Password
+                        </label>
+                        <div class="relative">
                             <input
-                                type="text"
-                                id="reg-username"
+                                type="password"
+                                id="reg-password"
                                 required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                oninput="clearErrors()">
-
-                            <p
-                                id="error-username"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Username is already taken, try a different one.
-                            </p>
-
+                                class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                oninput="clearRegErrors()">
+                            <button
+                                type="button"
+                                onclick="togglePasswordVisibility('reg-password', 'eye-icon-reg')"
+                                class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer">
+                                <span id="eye-icon-reg">👁️</span>
+                            </button>
                         </div>
+                        <p id="error-password" class="text-danger text-xs mt-1 hidden font-semibold"></p>
+                    </div>
 
-                        <div class="mb-4">
+                    <button
+                        type="submit"
+                        class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primaryDark transition shadow-md cursor-pointer">
+                        Create Account
+                    </button>
 
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Gmail Address
-                            </label>
-
-                            <input
-                                type="email"
-                                id="reg-email"
-                                placeholder="student@gmail.com"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                oninput="clearErrors()">
-
-                            <p
-                                id="error-email"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Gmail is already registered, try a different one.
-                            </p>
-
-                            <p
-                                id="error-email-format"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Email must be in a valid @gmail.com format.
-                            </p>
-
-                        </div>
-
-                        <div class="mb-4">
-
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Indian Phone Number (+91)
-                            </label>
-
-                            <input
-                                type="tel"
-                                id="reg-phone"
-                                placeholder="9876543210"
-                                maxlength="10"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                oninput="clearErrors()">
-
-                            <p
-                                id="error-phone"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Phone number is already registered.
-                            </p>
-
-                            <p
-                                id="error-phone-format"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Must be a valid 10-digit Indian mobile number (starts with 6-9).
-                            </p>
-
-                        </div>
-
-                        <div class="mb-6 relative">
-
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Password (Min 8 chars, mixed types)
-                            </label>
-
-                            <div class="relative">
-
-                                <input
-                                    type="password"
-                                    id="reg-password"
-                                    required
-                                    class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    oninput="clearErrors()">
-
-                                <button
-                                    type="button"
-                                    onclick="togglePasswordVisibility('reg-password', 'eye-icon-reg')"
-                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer">
-
-                                    <span id="eye-icon-reg">👁️</span>
-
-                                </button>
-
-                            </div>
-
-                            <p
-                                id="error-password"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Password must be >=8 chars with letters, numbers & symbols.
-                            </p>
-
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primaryDark transition shadow-md cursor-pointer">
-                            Continue to Verification
-                        </button>
-
-                    </form>
-                </div>
-
-                <!-- Registration Step 2 -->
-                <div id="reg-step-2" class="hidden">
-
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">
-                        Verify Identity
-                    </h2>
-
-                    <p class="text-sm text-gray-500 mb-6">
-                        Step 2 of 2: Enter the exact 6-digit verification codes.
-                    </p>
-
-                    <form
-                        id="form-register-2"
-                        onsubmit="completeRegistration(event)">
-
-                        <div class="mb-4">
-
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Gmail Verification Code
-                            </label>
-
-                            <input
-                                type="text"
-                                id="verify-email-code"
-                                placeholder="6-digit code"
-                                maxlength="6"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono tracking-widest"
-                                oninput="clearErrors()">
-
-                            <p
-                                id="error-email-code"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Must be exactly 6 digits.
-                            </p>
-
-                        </div>
-
-                        <div class="mb-6">
-
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Phone SMS OTP
-                            </label>
-
-                            <input
-                                type="text"
-                                id="verify-phone-otp"
-                                placeholder="6-digit OTP"
-                                maxlength="6"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono tracking-widest"
-                                oninput="clearErrors()">
-
-                            <p
-                                id="error-phone-otp"
-                                class="text-danger text-xs mt-1 hidden font-semibold">
-                                Must be exactly 6 digits.
-                            </p>
-
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primaryDark transition shadow-md mb-3 cursor-pointer">
-                            Complete Registration
-                        </button>
-
+                    <p class="text-center text-sm text-gray-600 mt-4">
+                        Already have an account?
                         <button
                             type="button"
-                            onclick="goBackToStep1()"
-                            class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition cursor-pointer">
-                            Go Back
+                            onclick="switchView('login')"
+                            class="text-primary hover:text-primaryDark font-semibold cursor-pointer">
+                            Login here
                         </button>
+                    </p>
 
-                    </form>
-                </div>
-
+                </form>
             </div>
         </section>
 
@@ -377,14 +254,12 @@
                     System Login
                 </h2>
 
-                <form onsubmit="handleLogin(event, 'secure')">
+                <form onsubmit="handleLogin(event)">
 
                     <div class="mb-4">
-
                         <label class="block text-sm font-semibold text-gray-700 mb-1">
-                            Gmail Address
+                            Email Address
                         </label>
-
                         <input
                             type="email"
                             id="login-email"
@@ -392,80 +267,48 @@
                             required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                             oninput="clearLoginError()">
-
                     </div>
 
                     <div class="mb-6">
-
                         <label class="block text-sm font-semibold text-gray-700 mb-1">
                             Password
                         </label>
-
                         <div class="relative">
-
                             <input
                                 type="password"
                                 id="login-password"
                                 required
                                 class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                                 oninput="clearLoginError()">
-
                             <button
                                 type="button"
                                 onclick="togglePasswordVisibility('login-password', 'eye-icon-login')"
                                 class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer">
-
                                 <span id="eye-icon-login">👁️</span>
-
                             </button>
-
                         </div>
-
-                        <!-- Specific Error: User Does Not Exist -->
-                        <div
-                            id="error-login-notfound"
-                            class="hidden mt-3 p-3 bg-red-50 border border-red-200 rounded-md text-center">
-
-                            <p class="text-danger text-sm font-semibold">
-                                User does not exist.
-                            </p>
-
-                            <button
-                                type="button"
-                                onclick="switchView('register')"
-                                class="text-primary hover:text-primaryDark text-sm underline mt-1 font-semibold cursor-pointer">
-                                Please register here to create an account.
-                            </button>
-
-                        </div>
-
-                        <p
-                            id="error-login-password"
-                            class="text-danger text-xs mt-2 hidden font-semibold text-center">
-                            Incorrect email or password.
-                        </p>
-
+                        <p id="error-login-password" class="text-danger text-xs mt-2 hidden font-semibold text-center"></p>
                     </div>
 
                     <div class="space-y-3">
-
                         <button
                             type="submit"
                             class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primaryDark transition shadow-md cursor-pointer">
                             Secure Login
                         </button>
-
-                        <button
-                            type="button"
-                            onclick="handleLogin(event, 'vulnerable')"
-                            class="w-full bg-danger text-white font-bold py-3 rounded-lg hover:bg-dangerDark transition shadow-md cursor-pointer">
-                            Test SQL Injection Login
-                        </button>
-
                     </div>
 
-                </form>
+                    <p class="text-center text-sm text-gray-600 mt-4">
+                        Don't have an account?
+                        <button
+                            type="button"
+                            onclick="switchView('register')"
+                            class="text-primary hover:text-primaryDark font-semibold cursor-pointer">
+                            Register here
+                        </button>
+                    </p>
 
+                </form>
             </div>
         </section>
 
@@ -479,78 +322,45 @@
 
                     <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 sticky top-24">
 
-                        <h2
-                            id="form-heading"
-                            class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                        <h2 id="form-heading" class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
                             Create New Note
                         </h2>
 
                         <form id="note-form" onsubmit="saveNote(event)">
 
-                            <input
-                                type="hidden"
-                                id="edit-note-id"
-                                value="">
+                            <input type="hidden" id="edit-note-id" value="">
 
                             <div class="mb-4">
-
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">
                                     Title
                                 </label>
-
                                 <input
                                     type="text"
                                     id="note-title"
                                     required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                                     placeholder="e.g., Operating Systems - Deadlocks">
-
                             </div>
 
                             <div class="mb-4">
-
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                    Attach Diagram/Image
+                                    Note Content
                                 </label>
-
-                                <input
-                                    type="file"
-                                    id="note-image"
-                                    accept="image/*"
-                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-primary hover:file:bg-blue-100 cursor-pointer transition">
-
-                                <img
-                                    id="image-preview"
-                                    src=""
-                                    alt="Preview"
-                                    class="hidden mt-3 rounded-lg border border-gray-200 max-h-40 object-cover w-full">
-
-                            </div>
-
-                            <div class="mb-4">
-
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                    Detailed Note Content (Unlimited Length)
-                                </label>
-
                                 <textarea
                                     id="note-content"
                                     rows="6"
                                     required
-                                    placeholder="Detail equations, definitions, bullet points, or algorithmic steps here..."
+                                    placeholder="Enter your note details here..."
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-y"></textarea>
-
                             </div>
 
                             <div class="flex gap-2">
-
                                 <button
                                     type="submit"
                                     id="save-btn"
                                     class="flex-1 bg-primary text-white font-bold py-2 rounded-lg hover:bg-primaryDark transition shadow-sm cursor-pointer">
                                     Save Note
                                 </button>
-
                                 <button
                                     type="button"
                                     id="cancel-edit-btn"
@@ -558,7 +368,6 @@
                                     class="hidden bg-gray-400 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-50 transition cursor-pointer">
                                     Cancel
                                 </button>
-
                             </div>
 
                         </form>
@@ -567,58 +376,10 @@
 
                 <!-- Notes Grid Column -->
                 <div class="w-full lg:w-2/3">
-
                     <h2 class="text-xl font-bold text-gray-800 mb-4">
-                        Your Detailed Personal Notes
+                        Your Notes
                     </h2>
-
-                    <div
-                        id="notes-container"
-                        class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <!-- Sample Note 1 -->
-                        <div
-                            class="bg-white p-5 rounded-xl shadow-sm border-t-4 border-primary hover:shadow-md transition flex flex-col h-full note-card"
-                            data-id="1">
-
-                            <h3 class="text-lg font-bold text-gray-800 mb-2">
-                                Linear Algebra: Eigenvalues & Vectors
-                            </h3>
-
-                            <img
-                                src="https://placehold.co/400x200/e2e8f0/475569?text=Matrix+Transformation"
-                                alt="Diagram"
-                                class="rounded-md mb-3 w-full h-32 object-cover">
-
-                            <p class="text-gray-600 text-sm flex-grow mb-4 whitespace-pre-wrap">Key Formulas:
-• Av = λv
-• Characteristic Equation: det(A - λI) = 0
-Used extensively in principal component analysis (PCA), quantum mechanics, and graph theory algorithms.</p>
-
-                            <div class="mt-auto pt-3 border-t border-gray-100 flex flex-wrap gap-2">
-
-                                <button
-                                    onclick="editNote(1, 'Linear Algebra: Eigenvalues & Vectors', 'Key Formulas:\n• Av = λv\n• Characteristic Equation: det(A - λI) = 0\nUsed extensively in principal component analysis (PCA), quantum mechanics, and graph theory algorithms.', 'https://placehold.co/400x200/e2e8f0/475569?text=Matrix+Transformation')"
-                                    class="bg-amber-500 text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-amber-600 transition cursor-pointer flex-1">
-                                    Edit
-                                </button>
-
-                                <button
-                                    onclick="shareNote('Linear Algebra: Eigenvalues & Vectors', 'Key Formulas:\nAv = lambda v\nCharacteristic Equation: det(A - lambda I) = 0')"
-                                    class="bg-emerald-500 text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-emerald-600 transition cursor-pointer flex-1">
-                                    Share
-                                </button>
-
-                                <button
-                                    onclick="downloadNote('Linear_Algebra_Summary', 'Key Formulas:\nAv = lambda v\nCharacteristic Equation: det(A - lambda I) = 0')"
-                                    class="bg-indigo-600 text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-indigo-700 transition cursor-pointer flex-1">
-                                    Download
-                                </button>
-
-                            </div>
-                        </div>
-
-                    </div>
+                    <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
                 </div>
             </div>
         </section>
@@ -626,926 +387,346 @@ Used extensively in principal component analysis (PCA), quantum mechanics, and g
     </main>
 
     <!-- Custom Modal for Alerts -->
-    <div
-        id="custom-modal"
-        class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4 transition-opacity duration-300">
-
-        <div
-            class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden transform scale-95 transition-transform duration-300"
-            id="custom-modal-content">
-
+    <div id="custom-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden transform scale-95 transition-transform duration-300" id="custom-modal-content">
             <div class="p-6">
-
-                <h3
-                    id="modal-title"
-                    class="text-xl font-bold text-gray-900 mb-2">
-                    Message
-                </h3>
-
-                <p
-                    id="modal-message"
-                    class="text-gray-600 text-sm mb-6 leading-relaxed">
-                    This is a custom alert message.
-                </p>
-
+                <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-2">Message</h3>
+                <p id="modal-message" class="text-gray-600 text-sm mb-6 leading-relaxed"></p>
                 <div class="flex justify-end">
-
-                    <button
-                        onclick="closeModal()"
-                        class="bg-primary text-white font-bold py-2 px-6 rounded-lg hover:bg-primaryDark transition cursor-pointer">
+                    <button onclick="closeModal()" class="bg-primary text-white font-bold py-2 px-6 rounded-lg hover:bg-primaryDark transition cursor-pointer">
                         OK
                     </button>
-
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-
-        // Registered users list
-        // Kept for the existing registration UI.
-        // Backend authentication is used for login.
-        let registeredUsers = [
-            {
-                username: 'admin',
-                email: 'admin@gmail.com',
-                phone: '9876543210',
-                password: 'Password@123'
-            },
-            {
-                username: 'student1',
-                email: 'student1@gmail.com',
-                phone: '9123456789',
-                password: 'SecurePassword1#'
-            }
-        ];
-
-        let noteIdCounter = 3;
+        const API_URL = 'http://localhost:3000/api';
 
         // View Management
         const views = ['home', 'register', 'login', 'dashboard'];
 
         function switchView(targetView) {
-
             views.forEach(view => {
-
                 const el = document.getElementById(`view-${view}`);
-
-                if (el) {
-                    el.classList.remove('active');
-                }
-
+                if (el) el.classList.remove('active');
             });
-
             const target = document.getElementById(`view-${targetView}`);
-
-            if (target) {
-                target.classList.add('active');
-            }
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+            if (target) target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Modal Management
         function showModal(title, message) {
-
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
-
             const modal = document.getElementById('custom-modal');
             const content = document.getElementById('custom-modal-content');
-
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-
             setTimeout(() => {
-
                 content.classList.remove('scale-95');
                 content.classList.add('scale-100');
-
             }, 10);
         }
 
         function closeModal() {
-
             const modal = document.getElementById('custom-modal');
             const content = document.getElementById('custom-modal-content');
-
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
-
             setTimeout(() => {
-
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
-
             }, 200);
         }
 
         // Password Visibility Toggle
         function togglePasswordVisibility(fieldId, iconId) {
-
             const passwordInput = document.getElementById(fieldId);
             const eyeIcon = document.getElementById(iconId);
-
             if (passwordInput.type === 'password') {
-
                 passwordInput.type = 'text';
                 eyeIcon.textContent = '🔒';
-
             } else {
-
                 passwordInput.type = 'password';
                 eyeIcon.textContent = '👁️';
-
             }
         }
 
         // Registration Logic
-        function clearErrors() {
-
-            document
-                .querySelectorAll('[id^="error-"]')
-                .forEach(el => el.classList.add('hidden'));
+        function clearRegErrors() {
+            document.querySelectorAll('[id^="error-"]').forEach(el => {
+                if (el.id.startsWith('error-') && !el.id.includes('login')) {
+                    el.classList.add('hidden');
+                }
+            });
         }
 
-        function handleRegisterStep1(e) {
-
+        async function handleRegister(e) {
             e.preventDefault();
-            clearErrors();
+            clearRegErrors();
 
-            const username =
-                document.getElementById('reg-username').value.trim();
-
-            const email =
-                document.getElementById('reg-email').value.trim();
-
-            const phone =
-                document.getElementById('reg-phone').value.trim();
-
-            const password =
-                document.getElementById('reg-password').value;
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const password = document.getElementById('reg-password').value;
 
             let hasError = false;
 
-            // Check username
-            if (
-                registeredUsers.some(
-                    u => u.username.toLowerCase() === username.toLowerCase()
-                )
-            ) {
-
-                document
-                    .getElementById('error-username')
-                    .classList.remove('hidden');
-
+            // Basic validation
+            if (!name) {
+                showError('error-name', 'Name is required.');
                 hasError = true;
             }
 
-            // Gmail format
-            if (!email.toLowerCase().endsWith('@gmail.com')) {
-
-                document
-                    .getElementById('error-email-format')
-                    .classList.remove('hidden');
-
-                hasError = true;
-
-            } else if (
-                registeredUsers.some(
-                    u => u.email.toLowerCase() === email.toLowerCase()
-                )
-            ) {
-
-                document
-                    .getElementById('error-email')
-                    .classList.remove('hidden');
-
+            if (!email) {
+                showError('error-email', 'Email is required.');
                 hasError = true;
             }
 
-            // Phone uniqueness
-            if (registeredUsers.some(u => u.phone === phone)) {
-
-                document
-                    .getElementById('error-phone')
-                    .classList.remove('hidden');
-
+            if (!phone) {
+                showError('error-phone', 'Phone is required.');
+                hasError = true;
+            } else if (!/^[6-9]\d{9}$/.test(phone)) {
+                showError('error-phone', 'Phone must be 10 digits starting with 6-9.');
                 hasError = true;
             }
 
-            // Indian phone format
-            const indianPhoneRegex = /^[6-9]\d{9}$/;
-
-            if (!indianPhoneRegex.test(phone)) {
-
-                document
-                    .getElementById('error-phone-format')
-                    .classList.remove('hidden');
-
+            if (!password || password.length < 4) {
+                showError('error-password', 'Password must be at least 4 characters.');
                 hasError = true;
             }
 
-            // Password validation
-            const minLength = password.length >= 8;
-            const hasLetter = /[a-zA-Z]/.test(password);
-            const hasNumber = /[0-9]/.test(password);
-            const hasSymbol = /[^a-zA-Z0-9]/.test(password);
-
-            if (
-                !minLength ||
-                !hasLetter ||
-                !hasNumber ||
-                !hasSymbol
-            ) {
-
-                document
-                    .getElementById('error-password')
-                    .classList.remove('hidden');
-
-                hasError = true;
-            }
-
-            if (hasError) {
-                return;
-            }
-
-            window.tempUser = {
-                username,
-                email,
-                phone,
-                password
-            };
-
-            document
-                .getElementById('reg-step-1')
-                .classList.add('hidden');
-
-            document
-                .getElementById('reg-step-2')
-                .classList.remove('hidden');
-        }
-
-        function goBackToStep1() {
-
-            document
-                .getElementById('reg-step-2')
-                .classList.add('hidden');
-
-            document
-                .getElementById('reg-step-1')
-                .classList.remove('hidden');
-        }
-
-        function completeRegistration(e) {
-
-            e.preventDefault();
-            clearErrors();
-
-            const emailCode =
-                document.getElementById('verify-email-code').value.trim();
-
-            const phoneOtp =
-                document.getElementById('verify-phone-otp').value.trim();
-
-            let hasError = false;
-
-            if (
-                emailCode.length !== 6 ||
-                !/^\d{6}$/.test(emailCode)
-            ) {
-
-                document
-                    .getElementById('error-email-code')
-                    .classList.remove('hidden');
-
-                hasError = true;
-            }
-
-            if (
-                phoneOtp.length !== 6 ||
-                !/^\d{6}$/.test(phoneOtp)
-            ) {
-
-                document
-                    .getElementById('error-phone-otp')
-                    .classList.remove('hidden');
-
-                hasError = true;
-            }
-
-            if (hasError) {
-                return;
-            }
-
-            if (window.tempUser) {
-
-                registeredUsers.push(window.tempUser);
-                window.tempUser = null;
-            }
-
-            document
-                .getElementById('form-register-1')
-                .reset();
-
-            document
-                .getElementById('form-register-2')
-                .reset();
-
-            goBackToStep1();
-
-            showModal(
-                "Registration Successful",
-                "Identity verified successfully. Please sign in with your credentials."
-            );
-
-            switchView('login');
-        }
-
-        // Login Logic
-        function clearLoginError() {
-
-            document
-                .getElementById('error-login-notfound')
-                .classList.add('hidden');
-
-            const passwordError =
-                document.getElementById('error-login-password');
-
-            passwordError.classList.add('hidden');
-            passwordError.textContent = 'Incorrect email or password.';
-        }
-
-        async function handleLogin(e, mode) {
-
-            e.preventDefault();
-            clearLoginError();
-
-            const emailInput =
-                document.getElementById('login-email').value.trim();
-
-            const passwordInput =
-                document.getElementById('login-password').value;
-
-            if (!emailInput || !passwordInput) {
-                return;
-            }
+            if (hasError) return;
 
             try {
-
-                const endpoint =
-                    mode === 'vulnerable'
-                        ? 'http://localhost:3000/api/login-vulnerable'
-                        : 'http://localhost:3000/api/login';
-
-                const response = await fetch(endpoint, {
-
+                const response = await fetch(`${API_URL}/register`, {
                     method: 'POST',
-
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-
-                    credentials: 'include',
-
                     body: JSON.stringify({
-                        email: emailInput,
-                        password: passwordInput
+                        name,
+                        email,
+                        phone,
+                        password
                     })
                 });
 
                 const data = await response.json();
 
-                if (!response.ok) {
-
-                    const errorMessage =
-                        data.error || 'Incorrect email or password.';
-
-                    document.getElementById(
-                        'error-login-password'
-                    ).textContent = errorMessage;
-
-                    document.getElementById(
-                        'error-login-password'
-                    ).classList.remove('hidden');
-
-                    return;
+                if (response.ok) {
+                    showModal('Success', 'Account created successfully! You are now logged in.');
+                    document.getElementById('form-register').reset();
+                    updateAuthUI();
+                    switchView('dashboard');
+                } else {
+                    showError('error-email', data.error || 'Registration failed.');
                 }
-
-                window.currentUser = data.user;
-
-                document
-                    .getElementById('nav-logged-out')
-                    .classList.add('hidden');
-
-                document
-                    .getElementById('nav-logged-out')
-                    .classList.remove('flex');
-
-                document
-                    .getElementById('nav-logged-in')
-                    .classList.remove('hidden');
-
-                document
-                    .getElementById('nav-logged-in')
-                    .classList.add('flex');
-
-                const welcomeText =
-                    document.querySelector('#nav-logged-in span');
-
-                if (welcomeText && data.user) {
-
-                    welcomeText.textContent =
-                        `Welcome, ${data.user.name || 'Student'}`;
-                }
-
-                document
-                    .getElementById('login-email')
-                    .value = '';
-
-                document
-                    .getElementById('login-password')
-                    .value = '';
-
-                switchView('dashboard');
-
             } catch (error) {
+                console.error('Register error:', error);
+                showError('error-email', 'Registration failed. Please try again.');
+            }
+        }
 
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = message;
+                el.classList.remove('hidden');
+            }
+        }
+
+        // Login Logic
+        function clearLoginError() {
+            document.getElementById('error-login-password').classList.add('hidden');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            clearLoginError();
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showModal('Success', 'Login successful!');
+                    document.querySelector('form').reset();
+                    updateAuthUI();
+                    switchView('dashboard');
+                } else {
+                    document.getElementById('error-login-password').textContent = data.error || 'Login failed.';
+                    document.getElementById('error-login-password').classList.remove('hidden');
+                }
+            } catch (error) {
                 console.error('Login error:', error);
+                document.getElementById('error-login-password').textContent = 'Login failed. Please try again.';
+                document.getElementById('error-login-password').classList.remove('hidden');
+            }
+        }
 
-                showModal(
-                    'Connection Error',
-                    'Could not connect to the backend server. Make sure the backend is running on port 3000.'
-                );
+        // Auth UI Update
+        async function updateAuthUI() {
+            try {
+                const response = await fetch(`${API_URL}/me`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (data.authenticated) {
+                    document.getElementById('nav-logged-out').classList.add('hidden');
+                    document.getElementById('nav-logged-in').classList.remove('hidden');
+                    document.getElementById('welcome-name').textContent = data.user.name || 'Student';
+                    loadNotes();
+                } else {
+                    document.getElementById('nav-logged-out').classList.remove('hidden');
+                    document.getElementById('nav-logged-in').classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
             }
         }
 
         // Logout
         async function logout() {
-
             try {
-
-                await fetch(
-                    'http://localhost:3000/api/logout',
-                    {
-                        method: 'POST',
-                        credentials: 'include'
-                    }
-                );
-
+                await fetch(`${API_URL}/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                updateAuthUI();
+                switchView('home');
+                showModal('Logout', 'You have been logged out successfully.');
             } catch (error) {
-
                 console.error('Logout error:', error);
             }
-
-            window.currentUser = null;
-
-            document
-                .getElementById('nav-logged-out')
-                .classList.remove('hidden');
-
-            document
-                .getElementById('nav-logged-out')
-                .classList.add('flex');
-
-            document
-                .getElementById('nav-logged-in')
-                .classList.add('hidden');
-
-            document
-                .getElementById('nav-logged-in')
-                .classList.remove('flex');
-
-            switchView('home');
         }
 
-        // Image Preview Logic
-        const noteImageInput =
-            document.getElementById('note-image');
+        // Notes Management
+        let notes = [];
 
-        if (noteImageInput) {
-
-            noteImageInput.addEventListener(
-                'change',
-                function(e) {
-
-                    const file = e.target.files[0];
-
-                    const preview =
-                        document.getElementById('image-preview');
-
-                    if (file) {
-
-                        const reader = new FileReader();
-
-                        reader.onload = function(event) {
-
-                            preview.src = event.target.result;
-
-                            preview.classList.remove('hidden');
-                        };
-
-                        reader.readAsDataURL(file);
-
-                    } else {
-
-                        preview.classList.add('hidden');
-                        preview.src = "";
-                    }
+        async function loadNotes() {
+            try {
+                const response = await fetch(`${API_URL}/notes`, {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    notes = await response.json();
+                    renderNotes();
                 }
-            );
+            } catch (error) {
+                console.error('Load notes error:', error);
+            }
         }
 
-        function saveNote(e) {
-
-            e.preventDefault();
-
-            const editId =
-                document.getElementById('edit-note-id').value;
-
-            const title =
-                document.getElementById('note-title').value;
-
-            const content =
-                document.getElementById('note-content').value;
-
-            const previewSrc =
-                document.getElementById('image-preview').src;
-
-            const hasImage =
-                !document
-                    .getElementById('image-preview')
-                    .classList
-                    .contains('hidden');
-
-            const safeTitle =
-                title
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
-
-            const safeContent =
-                content
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
-
-            if (editId) {
-
-                const card =
-                    document.querySelector(
-                        `.note-card[data-id="${editId}"]`
-                    );
-
-                if (card) {
-
-                    card.querySelector('h3').textContent =
-                        safeTitle;
-
-                    card.querySelector('p').textContent =
-                        safeContent;
-
-                    let imgEl =
-                        card.querySelector('img');
-
-                    if (hasImage) {
-
-                        if (imgEl) {
-
-                            imgEl.src = previewSrc;
-
-                        } else {
-
-                            const newImg =
-                                document.createElement('img');
-
-                            newImg.src = previewSrc;
-                            newImg.alt = "Diagram";
-
-                            newImg.className =
-                                "rounded-md mb-3 w-full h-32 object-cover";
-
-                            card.insertBefore(
-                                newImg,
-                                card.querySelector('p')
-                            );
-                        }
-
-                    } else if (imgEl) {
-
-                        imgEl.remove();
-                    }
-
-                    const editBtn =
-                        card.querySelector(
-                            'button:nth-child(1)'
-                        );
-
-                    if (editBtn) {
-
-                        editBtn.setAttribute(
-                            'onclick',
-                            `editNote(${editId}, '${safeTitle.replace(/'/g, "\\'")}', '${safeContent.replace(/'/g, "\\'").replace(/\n/g, "\\n")}', '${hasImage ? previewSrc : ''}')`
-                        );
-                    }
-                }
-
-                cancelEdit();
-
-                showModal(
-                    "Note Updated",
-                    "Your note has been updated successfully."
-                );
-
-            } else {
-
-                const container =
-                    document.getElementById('notes-container');
-
-                const newId =
-                    noteIdCounter++;
-
-                const card =
-                    document.createElement('div');
-
-                card.className =
-                    "bg-white p-5 rounded-xl shadow-sm border-t-4 border-primary hover:shadow-md transition flex flex-col h-full note-card";
-
-                card.setAttribute('data-id', newId);
-
-                let imgHTML = '';
-
-                if (hasImage) {
-
-                    imgHTML =
-                        `<img src="${previewSrc}" alt="Diagram" class="rounded-md mb-3 w-full h-32 object-cover">`;
-                }
-
-                card.innerHTML = `
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">${safeTitle}</h3>
-
-                    ${imgHTML}
-
-                    <p class="text-gray-600 text-sm flex-grow mb-4 whitespace-pre-wrap">${safeContent}</p>
-
+        function renderNotes() {
+            const container = document.getElementById('notes-container');
+            container.innerHTML = '';
+            notes.forEach(note => {
+                const noteEl = document.createElement('div');
+                noteEl.className = 'bg-white p-5 rounded-xl shadow-sm border-t-4 border-primary hover:shadow-md transition flex flex-col h-full';
+                noteEl.innerHTML = `
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">${note.title}</h3>
+                    <p class="text-gray-600 text-sm flex-grow mb-4 whitespace-pre-wrap">${note.content}</p>
                     <div class="mt-auto pt-3 border-t border-gray-100 flex flex-wrap gap-2">
-
-                        <button
-                            onclick="editNote(${newId}, '${safeTitle.replace(/'/g, "\\'")}', '${safeContent.replace(/'/g, "\\'").replace(/\n/g, "\\n")}', '${hasImage ? previewSrc : ''}')"
-                            class="bg-amber-500 text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-amber-600 transition cursor-pointer flex-1">
+                        <button onclick="editNote(${note.id}, '${note.title}', '${note.content}')" class="bg-amber-500 text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-amber-600 transition cursor-pointer flex-1">
                             Edit
                         </button>
-
-                        <button
-                            onclick="shareNote('${safeTitle}', '${safeContent.replace(/'/g, "\\'")}')"
-                            class="bg-emerald-500 text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-emerald-600 transition cursor-pointer flex-1">
-                            Share
+                        <button onclick="deleteNote(${note.id})" class="bg-danger text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-dangerDark transition cursor-pointer flex-1">
+                            Delete
                         </button>
-
-                        <button
-                            onclick="downloadNote('${safeTitle}', '${safeContent.replace(/'/g, "\\'")}')"
-                            class="bg-indigo-600 text-white text-xs font-semibold py-1.5 px-3 rounded hover:bg-indigo-700 transition cursor-pointer flex-1">
-                            Download
-                        </button>
-
                     </div>
                 `;
-
-                container.insertBefore(
-                    card,
-                    container.firstChild
-                );
-
-                document
-                    .getElementById('note-form')
-                    .reset();
-
-                document
-                    .getElementById('image-preview')
-                    .classList
-                    .add('hidden');
-
-                showModal(
-                    "Note Saved",
-                    "Your new note has been saved successfully."
-                );
-            }
-        }
-
-        function editNote(id, title, content, imgSrc) {
-
-            document
-                .getElementById('edit-note-id')
-                .value = id;
-
-            document
-                .getElementById('note-title')
-                .value = title;
-
-            document
-                .getElementById('note-content')
-                .value = content;
-
-            const preview =
-                document.getElementById('image-preview');
-
-            if (
-                imgSrc &&
-                imgSrc !== 'undefined' &&
-                imgSrc !== ''
-            ) {
-
-                preview.src = imgSrc;
-                preview.classList.remove('hidden');
-
-            } else {
-
-                preview.classList.add('hidden');
-                preview.src = '';
-            }
-
-            document
-                .getElementById('form-heading')
-                .textContent = "Edit Note";
-
-            document
-                .getElementById('save-btn')
-                .textContent = "Update Note";
-
-            document
-                .getElementById('cancel-edit-btn')
-                .classList
-                .remove('hidden');
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+                container.appendChild(noteEl);
             });
         }
 
+        async function saveNote(e) {
+            e.preventDefault();
+            const title = document.getElementById('note-title').value;
+            const content = document.getElementById('note-content').value;
+            const noteId = document.getElementById('edit-note-id').value;
+
+            try {
+                const method = noteId ? 'PUT' : 'POST';
+                const endpoint = noteId ? `${API_URL}/notes/${noteId}` : `${API_URL}/notes`;
+                const response = await fetch(endpoint, {
+                    method: method,
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+                if (response.ok) {
+                    showModal('Success', noteId ? 'Note updated!' : 'Note created!');
+                    document.getElementById('note-form').reset();
+                    document.getElementById('edit-note-id').value = '';
+                    document.getElementById('save-btn').textContent = 'Save Note';
+                    document.getElementById('cancel-edit-btn').classList.add('hidden');
+                    document.getElementById('form-heading').textContent = 'Create New Note';
+                    loadNotes();
+                }
+            } catch (error) {
+                console.error('Save note error:', error);
+                showModal('Error', 'Failed to save note.');
+            }
+        }
+
+        function editNote(id, title, content) {
+            document.getElementById('note-title').value = title;
+            document.getElementById('note-content').value = content;
+            document.getElementById('edit-note-id').value = id;
+            document.getElementById('save-btn').textContent = 'Update Note';
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('form-heading').textContent = 'Edit Note';
+        }
+
         function cancelEdit() {
-
-            document
-                .getElementById('edit-note-id')
-                .value = '';
-
-            document
-                .getElementById('note-form')
-                .reset();
-
-            document
-                .getElementById('image-preview')
-                .classList
-                .add('hidden');
-
-            document
-                .getElementById('image-preview')
-                .src = '';
-
-            document
-                .getElementById('form-heading')
-                .textContent = "Create New Note";
-
-            document
-                .getElementById('save-btn')
-                .textContent = "Save Note";
-
-            document
-                .getElementById('cancel-edit-btn')
-                .classList
-                .add('hidden');
+            document.getElementById('note-form').reset();
+            document.getElementById('edit-note-id').value = '';
+            document.getElementById('save-btn').textContent = 'Save Note';
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.getElementById('form-heading').textContent = 'Create New Note';
         }
 
-        // Web Share API support
-        async function shareNote(title, text) {
-
-            if (navigator.share) {
-
-                try {
-
-                    await navigator.share({
-                        title: title,
-                        text: text,
-                        url: window.location.href
-                    });
-
-                } catch (err) {
-
-                    if (err.name !== "AbortError") {
-
-                        showModal(
-                            "Share Error",
-                            "An error occurred while sharing: " +
-                            err.message
-                        );
-                    }
+        async function deleteNote(id) {
+            if (!confirm('Are you sure you want to delete this note?')) return;
+            try {
+                const response = await fetch(`${API_URL}/notes/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    showModal('Success', 'Note deleted!');
+                    loadNotes();
                 }
-
-            } else {
-
-                try {
-
-                    const fallbackText =
-                        `${title}\n\n${text}\n\nLink: ${window.location.href}`;
-
-                    const textArea =
-                        document.createElement("textarea");
-
-                    textArea.value = fallbackText;
-
-                    document.body.appendChild(textArea);
-
-                    textArea.select();
-
-                    document.execCommand("copy");
-
-                    textArea.remove();
-
-                    showModal(
-                        "Copied to Clipboard",
-                        "Note contents were copied to your clipboard."
-                    );
-
-                } catch (e) {
-
-                    showModal(
-                        "Sharing Not Supported",
-                        "The Web Share API is not supported in your browser."
-                    );
-                }
+            } catch (error) {
+                console.error('Delete note error:', error);
+                showModal('Error', 'Failed to delete note.');
             }
         }
 
-        // Download note as text file
-        function downloadNote(title, text) {
-
-            const blob =
-                new Blob(
-                    [
-                        `${title}\n==================\n\n${text}`
-                    ],
-                    {
-                        type: 'text/plain;charset=utf-8'
-                    }
-                );
-
-            const url =
-                URL.createObjectURL(blob);
-
-            const a =
-                document.createElement('a');
-
-            a.href = url;
-
-            a.download =
-                `${title.toLowerCase().replace(/[^a-z0-9]/g, '_')}.txt`;
-
-            document.body.appendChild(a);
-
-            a.click();
-
-            document.body.removeChild(a);
-
-            URL.revokeObjectURL(url);
-        }
-
-        // Offline status banner management
-        const offlineBanner =
-            document.getElementById('offlineBanner');
-
-        function updateOnlineStatus() {
-
-            if (!offlineBanner) {
-                return;
-            }
-
-            if (!navigator.onLine) {
-
-                offlineBanner.classList.remove('hidden');
-                offlineBanner.classList.add('block');
-
-            } else {
-
-                offlineBanner.classList.add('hidden');
-                offlineBanner.classList.remove('block');
-            }
-        }
-
-        window.addEventListener(
-            'online',
-            updateOnlineStatus
-        );
-
-        window.addEventListener(
-            'offline',
-            updateOnlineStatus
-        );
-
-        updateOnlineStatus();
-
+        // Check auth on page load
+        window.addEventListener('load', updateAuthUI);
     </script>
-
 </body>
 </html>
