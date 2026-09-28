@@ -13,6 +13,9 @@ router.get('/', noteController.getNotes);
 // Create a new note (enforces 256-byte maximum limit)
 router.post('/', noteController.createNote);
 
+// Update a note by ID (user-isolated)
+router.put('/:id', noteController.updateNote);
+
 // Get single note by ID (user-isolated)
 router.get('/:id', noteController.getNoteById);
 
