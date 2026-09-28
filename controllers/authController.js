@@ -10,13 +10,14 @@ const db = require('../config/db');
 const SALT_ROUNDS = 10;
 
 /**
- * Register a new student
- * Uses email + password.
+ * Register a new user - DIRECT registration without OTP verification
+ * Saves: name, email, phone, password
  */
 async function register(req, res) {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, phone, password } = req.body;
 
+    // Validation
     if (!name || typeof name !== 'string' || name.trim() === '') {
       return res.status(400).json({
         error: 'Name is required.'
@@ -29,6 +30,12 @@ async function register(req, res) {
       });
     }
 
+    if (!phone || typeof phone !== 'string' || phone.trim() === '') {
+      return res.status(400).json({
+        error: 'Phone is required.'
+      });
+    }
+
     if (!password || typeof password !== 'string' || password.length < 4) {
       return res.status(400).json({
         error: 'Password must be at least 4 characters long.'
@@ -37,40 +44,59 @@ async function register(req, res) {
 
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = phone.trim();
 
-    // Check whether email already exists
-    const existing = await db.query(
+    // Check if email already exists
+    const emailExists = await db.query(
       'SELECT id FROM users WHERE email = $1',
       [cleanEmail]
     );
 
-    if (existing.rows.length > 0) {
+    if (emailExists.rows.length > 0) {
       return res.status(409).json({
         error: 'Email already registered. Please use another email.'
+      });
+    }
+
+    // Check if phone already exists
+    const phoneExists = await db.query(
+      'SELECT id FROM users WHERE phone = $1',
+      [cleanPhone]
+    );
+
+    if (phoneExists.rows.length > 0) {
+      return res.status(409).json({
+        error: 'Phone number already registered. Please use another phone.'
       });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-    // Insert user
+    // Insert user into database - NO verification codes needed
     const result = await db.query(
-      `INSERT INTO users (name, email, password_hash)
-       VALUES ($1, $2, $3)
-       RETURNING id, name, email, created_at`,
-      [cleanName, cleanEmail, hashedPassword]
+      `INSERT INTO users (name, email, phone, password_hash)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, phone, created_at`,
+      [cleanName, cleanEmail, cleanPhone, hashedPassword]
     );
 
     const user = result.rows[0];
 
-    // Establish session
+    // Establish session immediately after registration
     req.session.userId = user.id;
     req.session.email = user.email;
     req.session.name = user.name;
+    req.session.phone = user.phone;
 
     return res.status(201).json({
-      message: 'User registered successfully.',
-      user
+      message: 'User registered successfully. You are now logged in.',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone
+      }
     });
 
   } catch (error) {
@@ -98,7 +124,7 @@ async function login(req, res) {
 
     // Parameterized PostgreSQL query
     const result = await db.query(
-      `SELECT id, name, email, password_hash
+      `SELECT id, name, email, phone, password_hash
        FROM users
        WHERE email = $1`,
       [cleanEmail]
@@ -128,13 +154,15 @@ async function login(req, res) {
     req.session.userId = user.id;
     req.session.email = user.email;
     req.session.name = user.name;
+    req.session.phone = user.phone;
 
     return res.json({
       message: 'Login successful.',
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        phone: user.phone
       }
     });
 
@@ -163,7 +191,7 @@ async function loginVulnerable(req, res) {
 
     // INTENTIONALLY INSECURE - demonstration only
     const rawSql =
-      `SELECT id, name, email, password_hash FROM users WHERE email = '${email}'`;
+      `SELECT id, name, email, phone, password_hash FROM users WHERE email = '${email}'`;
 
     console.warn(
       `[SQL INJECTION DEMO] Executing raw query: ${rawSql}`
@@ -177,6 +205,7 @@ async function loginVulnerable(req, res) {
       req.session.userId = injectedUser.id;
       req.session.email = injectedUser.email;
       req.session.name = injectedUser.name;
+      req.session.phone = injectedUser.phone;
 
       return res.json({
         warning:
@@ -186,7 +215,8 @@ async function loginVulnerable(req, res) {
         user: {
           id: injectedUser.id,
           name: injectedUser.name,
-          email: injectedUser.email
+          email: injectedUser.email,
+          phone: injectedUser.phone
         }
       });
     }
@@ -240,7 +270,8 @@ function getCurrentUser(req, res) {
       user: {
         id: req.session.userId,
         name: req.session.name,
-        email: req.session.email
+        email: req.session.email,
+        phone: req.session.phone
       }
     });
   }
